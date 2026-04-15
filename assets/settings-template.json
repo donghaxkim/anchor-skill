@@ -2,7 +2,9 @@
   "permissions": {
     "deny": [
       "Edit(.anchors)",
-      "Write(.anchors)"
+      "Write(.anchors)",
+      "Bash(python*anchor.py*remove*)",
+      "Bash(python*anchor.py*update*)"
     ]
   },
   "hooks": {

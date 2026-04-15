@@ -11,6 +11,7 @@ import json
 import os
 import sys
 
+VERSION = "0.1.0"
 ANCHORS_FILE = ".anchors"
 ANCHORS_HEADER = "# .anchors — managed by anchor skill\n# Format: type | target | hash | description\n"
 SETTINGS_REL = os.path.join(".claude", "settings.json")
@@ -128,6 +129,16 @@ def parse_target(target_str):
         rel = os.path.relpath(target_str, root)
     else:
         rel = target_str
+
+    # Reject paths that escape the project root
+    # Strip any :line-range suffix before checking
+    check_path = rel.split(":")[0] if ":" in rel else rel
+    normalized = os.path.normpath(check_path)
+    if normalized.startswith(".."):
+        print(f"Error: Target is outside the project root ({root}).", file=sys.stderr)
+        print(f"  Resolved path: {os.path.join(root, check_path)}", file=sys.stderr)
+        print(f"  Only files within the project can be anchored.", file=sys.stderr)
+        sys.exit(1)
 
     # Check for line range (file.py:45-80)
     if ":" in rel:
@@ -286,7 +297,9 @@ def cmd_setup(args):
         "permissions": {
             "deny": [
                 "Edit(.anchors)",
-                "Write(.anchors)"
+                "Write(.anchors)",
+                "Bash(python*anchor.py*remove*)",
+                "Bash(python*anchor.py*update*)"
             ]
         },
         "hooks": {
@@ -354,7 +367,8 @@ def cmd_setup(args):
     print(f"Anchor enforcement configured in {SETTINGS_REL}")
     print(f"  Edit/Write hook: {enforce_edit}")
     print(f"  Bash hook:       {enforce_bash}")
-    print(f"  Deny rules:      Edit(.anchors), Write(.anchors)")
+    print(f"  Deny rules:      Edit(.anchors), Write(.anchors),")
+    print(f"                   Bash(python*anchor.py*remove*), Bash(python*anchor.py*update*)")
     print(f"\nRun /hooks in Claude Code to verify.")
 
 
@@ -367,6 +381,7 @@ def main():
         prog="anchor",
         description="Protect code regions from AI modification.",
     )
+    parser.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")
     sub = parser.add_subparsers(dest="command", required=True)
 
     # add
