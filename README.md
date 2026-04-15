@@ -36,6 +36,11 @@ The setup command adds PreToolUse hooks to your project's `.claude/settings.json
 
 ## Usage
 
+> **Note:** The examples below use `anchor` as shorthand. Claude resolves the full script path automatically. If you want to run commands yourself, add an alias:
+> ```bash
+> alias anchor="python3 ~/.claude/skills/anchor/scripts/anchor.py"
+> ```
+
 ```bash
 # Anchor a whole file
 anchor add src/auth.py --desc "security-critical, do not modify"
