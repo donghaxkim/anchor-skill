@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "deny": [
+      "Edit(.anchors)",
+      "Write(.anchors)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "SKILL_PATH/scripts/enforce_edit.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "SKILL_PATH/scripts/enforce_bash.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
